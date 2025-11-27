@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BINGO</title>
+  <style>
+    body {
+  font-family: 'Poppins', sans-serif;
+  background: url("gorilla.jpg") no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  padding: 20px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+        }
+    .container { max-width: 1200px; margin: 0 auto; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; font-size: 14px; background: rgba(255,255,255,0.9); color: #222; border-radius: 10px; overflow: hidden; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #006400; color: #fff; position: sticky; top: 0; z-index: 5; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    .highlight { background: #ffec8b; font-weight: 700; color: #c81d25; }
+    h1 { text-align: center; font-size: 2.5em; margin-top: 0; }
+    .note { text-align: center; font-size: 1.1em; margin-bottom: 10px; }
+    #fireworksCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+    .results { margin-bottom: 20px; text-align: center; position: sticky; top: 0; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 10px; z-index: 6; }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li { background: rgba(255,255,255,0.2); padding: 8px; margin: 5px auto; width: fit-content; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎄 BINGO 🎁</h1>
+<button id="toggleResults" 
+  style="padding:10px 15px; background:#006400; border:none; color:#fff; border-radius:8px; cursor:pointer; margin-bottom:10px;">
+  Hide Results
+</button>
+
+<div class="results" id="resultsBox">
+  <h2>✨ Official 6/49 Draw Results ✨</h2>
+  <ul id="resultsList"></ul>
+</div>
+
+
+    <table id="lottoTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>#1</th>
+          <th>#2</th>
+          <th>#3</th>
+          <th>#4</th>
+          <th>#5</th>
+          <th>#6</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const players = [
+{"name":"CHRIS","nums":[7,15,23,34,42,48]},
+{"name":"KING","nums":[4,9,17,18,23,25]},
+{"name":"KAT","nums":[2,4,13,14,23,30]},
+{"name":"VAL","nums":[2,8,13,29,34,45]},
+{"name":"JOHANNA","nums":[2,15,18,20,21,26]},
+{"name":"JOEL","nums":[5,7,10,24,47,49]},
+{"name":"RAUL","nums":[4,9,11,34,38,44]},
+{"name":"ARIEL","nums":[13,18,32,34,45,46]},
+{"name":"RICHARD","nums":[4,7,14,16,22,24]},
+{"name":"XXX","nums":[1,2,5,6,48,49]},
+{"name":"ROMEL","nums":[6,10,12,22,26,29]},
+{"name":"VLADIMIR","nums":[2,10,18,24,35,42]},
+{"name":"DEN","nums":[12,15,17,23,25,29]},
+{"name":"MARISSA","nums":[4,9,17,30,38,40]},
+{"name":"ROSELLA","nums":[13,16,19,29,30,49]},
+{"name":"ELVIE","nums":[10,11,17,29,34,35]},
+{"name":"SARGE","nums":[9,11,22,26,33,46]},
+{"name":"TEDDY","nums":[8,10,12,14,19,25]},
+{"name":"FAB","nums":[2,10,25,26,29,30]},
+{"name":"BAYAW","nums":[2,10,16,21,26,28]},
+{"name":"DEN","nums":[5,7,10,15,25,30]},
+{"name":"RITZ","nums":[1,17,22,44,45,49]},
+{"name":"RODA","nums":[8,18,21,22,26,47]},
+{"name":"MARIO MANALAD","nums":[7,8,18,26,29,31]},
+{"name":"DYNE","nums":[3,9,11,22,24,46]},
+{"name":"RONNIE","nums":[4,10,15,19,23,31]},
+{"name":"CESAR R.","nums":[3,5,9,10,25,26]},
+{"name":"MARIA","nums":[5,8,12,20,31,46]},
+{"name":"MAC","nums":[1,5,12,14,23,26]},
+{"name":"JINGGOY","nums":[6,18,19,24,27,29]},
+{"name":"ALLEN","nums":[5,15,25,35,45,49]},
+{"name":"PHEB","nums":[7,8,17,21,33,43]},
+{"name":"CHESTER","nums":[10,12,23,29,36,49]},
+{"name":"CHESTER","nums":[4,8,18,22,35,43]},
+{"name":"P.V.","nums":[16,18,23,38,42,46]},
+{"name":"CRIS O.","nums":[1,5,8,15,26,49]},
+{"name":"JULIAN","nums":[2,6,11,13,29,30]},
+{"name":"JEFF TABLE","nums":[3,35,38,41,46,49]},
+{"name":"GIRLIE","nums":[7,9,20,24,29,31]},
+{"name":"BOBERO","nums":[9,21,23,31,46,49]},
+{"name":"BRENDA","nums":[9,11,16,19,36,44]},
+{"name":"BRENDA","nums":[6,8,13,14,21,29]},
+{"name":"BONG FON","nums":[3,9,12,15,18,23]},
+{"name":"AYIE","nums":[9,11,16,22,29,38]},
+{"name":"OLIVE","nums":[8,12,19,26,31,43]},
+{"name":"JAN-JAN","nums":[1,5,9,10,28,46]},
+{"name":"YANANG","nums":[2,9,11,18,28,39]},
+{"name":"CESAR A.","nums":[5,9,10,11,24,34]},
+{"name":"BOSS RENZ","nums":[15,22,34,36,37,41]},
+{"name":"MARK PAUL","nums":[4,8,18,27,31,38]},
+{"name":"ISON","nums":[10,22,25,27,30,32]},
+{"name":"MARK PAUL","nums":[5,7,10,13,18,22]},
+{"name":"BOSS JEFF","nums":[2,4,5,7,14,47]},
+{"name":"DEN","nums":[3,15,23,28,33,47]},
+{"name":"SARGE 1","nums":[3,7,9,12,22,36]},
+{"name":"BRYAN","nums":[1,4,16,30,35,38]},
+{"name":"GIGI","nums":[4,5,8,11,14,17]},
+{"name":"RHEBZ","nums":[12,18,24,32,42,49]},
+{"name":"RIZZEL","nums":[2,5,7,19,21,35]},
+{"name":"JEN","nums":[4,6,19,21,24,28]},
+{"name":"CARLOS","nums":[8,10,12,13,25,33]},
+{"name":"BRANDON","nums":[24,25,34,35,44,45]},
+{"name":"BRANDON","nums":[1,6,10,16,22,23]}
+		];
+
+    let drawResults = [];
+    const tbody = document.querySelector('#lottoTable tbody');
+    const resultsList = document.getElementById('resultsList');
+
+const toggleBtn = document.getElementById("toggleResults");
+const resultsBox = document.getElementById("resultsBox");
+
+toggleBtn.addEventListener("click", () => {
+  if (resultsBox.style.display === "none") {
+    resultsBox.style.display = "block";
+    toggleBtn.textContent = "Hide Results";
+  } else {
+    resultsBox.style.display = "none";
+    toggleBtn.textContent = "Show Results";
+  }
+});
+
+    
+    async function fetchMagayoResults() {
+      try {
+        const res = await fetch(
+          "https://r.jina.ai/http://www.lotto-8.com/canada/listltoCA649.asp",
+          { cache: "no-store" }
+        );
+        const text = await res.text();
+
+        const lines = text.split(/\r?\n/);
+        const dateLineRe = /^\s*(\d{2})\/(\d{2})\s*$/;
+        const numsLineRe = /^\s*25\([A-Z]{3}\)(\d{1,2}(?:,\d{1,2}){5})\s+\d{1,2}\s*$/;
+
+        const resultsByDate = new Map();
+        const START = new Date("2025-11-22T00:00:00");
+        const monthNames = [null, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        for (let i = 0; i < lines.length; i++) {
+          const m = lines[i].match(dateLineRe);
+          if (!m) continue;
+
+          const dd = parseInt(m[1], 10);
+          const mm = parseInt(m[2], 10);
+
+          let j = i + 1;
+          while (j < lines.length && lines[j].trim() === "") j++;
+
+          if (j >= lines.length) continue;
+          const n = lines[j].match(numsLineRe);
+          if (!n) continue;
+
+          const dateObj = new Date(2025, mm - 1, dd);
+          if (isNaN(+dateObj) || dateObj < START) continue;
+
+          const nums = n[1].split(",").map(x => parseInt(x.trim(), 10));
+          if (nums.length !== 6 || nums.some(Number.isNaN)) continue;
+
+          const dateStr = `${dd} ${monthNames[mm]} 2025`;
+          resultsByDate.set(dateStr, nums);
+        }
+
+        drawResults = Array.from(resultsByDate.entries())
+          .map(([date, nums]) => ({ date, nums }))
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        updateResultsList();
+        updateTable();
+      } catch (err) {
+        console.error("Error fetching results:", err);
+        const li = document.createElement("li");
+        li.textContent = "Unable to fetch results automatically.";
+        resultsList.appendChild(li);
+      }
+    }
+
+    function updateTable() {
+      tbody.innerHTML = '';
+      players.forEach(player => {
+        const tr = document.createElement('tr');
+        const nameTd = document.createElement('td');
+        nameTd.textContent = player.name;
+        tr.appendChild(nameTd);
+
+        player.nums.forEach(num => {
+          const td = document.createElement('td');
+          td.textContent = num;
+          if (drawResults.some(r => r.nums.includes(num))) td.classList.add('highlight');
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateResultsList() {
+      resultsList.innerHTML = '';
+      drawResults.forEach(r => {
+        const li = document.createElement('li');
+        li.textContent = `${r.date}: ${r.nums.join(', ')}`;
+        resultsList.appendChild(li);
+      });
+    }
+
+    fetchMagayoResults();
+  </script>
+</body>
+</html>
