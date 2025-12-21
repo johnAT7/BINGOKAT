@@ -156,6 +156,7 @@ toggleBtn.addEventListener("click", () => {
 
         const resultsByDate = new Map();
         const START = new Date("2025-11-22T00:00:00");
+		const END = new Date("2025-12-18T23:59:59");
         const monthNames = [null, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         for (let i = 0; i < lines.length; i++) {
@@ -173,7 +174,12 @@ toggleBtn.addEventListener("click", () => {
           if (!n) continue;
 
           const dateObj = new Date(2025, mm - 1, dd);
-          if (isNaN(+dateObj) || dateObj < START) continue;
+          if (
+  isNaN(+dateObj) ||
+  dateObj < START ||
+  dateObj > END
+) continue;
+
 
           const nums = n[1].split(",").map(x => parseInt(x.trim(), 10));
           if (nums.length !== 6 || nums.some(Number.isNaN)) continue;
