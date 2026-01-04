@@ -162,6 +162,9 @@ toggleBtn.addEventListener("click", () => {
 		  
 		let currentYear = null;
 
+		let inferredYear = START.getFullYear();
+		let lastMonth = null;
+
         const resultsByDate = new Map();
         const START = new Date("2025-12-19T00:00:00");
 		const END = new Date("2026-04-13T23:59:59");
@@ -182,20 +185,26 @@ for (let i = 0; i < lines.length; i++) {
   const n = lines[j].match(numsLineRe);
   if (!n) continue;
 
-  let year = START.getFullYear();
-  let dateObj = new Date(year, mm - 1, dd);
+if (lastMonth !== null && mm < lastMonth) {
+  inferredYear++;
+}
+lastMonth = mm;
+	
+// detect year rollover (Dec → Jan)
+if (lastMonth !== null && mm < lastMonth) {
+  inferredYear++;
+}
+lastMonth = mm;
 
-  if (dateObj < START) {
-    year++;
-    dateObj = new Date(year, mm - 1, dd);
-  }
+const dateObj = new Date(inferredYear, mm - 1, dd);
+if (dateObj < START || dateObj > END) continue;
 
-  if (dateObj < START || dateObj > END) continue;
+const dateStr = `${dd} ${monthNames[mm]} ${inferredYear}`;
+
 
   const nums = n[1].split(",").map(Number);
   if (nums.length !== 6) continue;
 
-  const dateStr = `${dd} ${monthNames[mm]} ${year}`;
   resultsByDate.set(dateStr, nums);
 }
 
