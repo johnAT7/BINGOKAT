@@ -179,18 +179,16 @@ toggleBtn.addEventListener("click", () => {
           const n = lines[j].match(numsLineRe);
           if (!n) continue;
 
-          const dateObj = new Date(2025, mm - 1, dd);
-          if (
-  isNaN(+dateObj) ||
-  dateObj < START ||
-  dateObj > END
-) continue;
+const year = (mm >= 12) ? 2025 : 2026;
+const dateObj = new Date(year, mm - 1, dd);
+
+if (isNaN(+dateObj) || dateObj < START || dateObj > END) continue;
 
 
           const nums = n[1].split(",").map(x => parseInt(x.trim(), 10));
           if (nums.length !== 6 || nums.some(Number.isNaN)) continue;
 
-          const dateStr = `${dd} ${monthNames[mm]} 2025`;
+          const dateStr = `${dd} ${monthNames[mm]} ${year}`;
           resultsByDate.set(dateStr, nums);
         }
 
