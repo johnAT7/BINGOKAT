@@ -170,7 +170,6 @@ toggleBtn.addEventListener("click", () => {
 
 for (let i = 0; i < lines.length; i++) {
 
-  // detect year header (2025, 2026, etc.)
   const y = lines[i].match(yearLineRe);
   if (y) {
     currentYear = parseInt(y[1], 10);
@@ -180,29 +179,26 @@ for (let i = 0; i < lines.length; i++) {
   const m = lines[i].match(dateLineRe);
   if (!m || !currentYear) continue;
 
+  const dd = parseInt(m[1], 10);
+  const mm = parseInt(m[2], 10);
 
-          const dd = parseInt(m[1], 10);
-          const mm = parseInt(m[2], 10);
+  let j = i + 1;
+  while (j < lines.length && lines[j].trim() === "") j++;
+  if (j >= lines.length) continue;
 
-          let j = i + 1;
-          while (j < lines.length && lines[j].trim() === "") j++;
+  const n = lines[j].match(numsLineRe);
+  if (!n) continue;
 
-          if (j >= lines.length) continue;
-          const n = lines[j].match(numsLineRe);
-          if (!n) continue;
+  const dateObj = new Date(currentYear, mm - 1, dd);
+  if (isNaN(+dateObj) || dateObj < START || dateObj > END) continue;
 
-const year = (mm >= 12) ? 2025 : 2026;
-const dateObj = new Date(currentYear, mm - 1, dd);
+  const nums = n[1].split(",").map(Number);
+  if (nums.length !== 6) continue;
 
-if (isNaN(+dateObj) || dateObj < START || dateObj > END) continue;
+  const dateStr = `${dd} ${monthNames[mm]} ${currentYear}`;
+  resultsByDate.set(dateStr, nums);
+}
 
-
-          const nums = n[1].split(",").map(x => parseInt(x.trim(), 10));
-          if (nums.length !== 6 || nums.some(Number.isNaN)) continue;
-
-          const dateStr = `${dd} ${monthNames[mm]} ${currentYear}`;
-          resultsByDate.set(dateStr, nums);
-        }
 
         drawResults = Array.from(resultsByDate.entries())
           .map(([date, nums]) => ({ date, nums }))
