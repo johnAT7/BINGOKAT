@@ -158,9 +158,8 @@ toggleBtn.addEventListener("click", () => {
 
         const lines = text.split(/\r?\n/);
         const dateLineRe = /^\s*(\d{2})\/(\d{2})\s*$/;
-        const numsLineRe = /^\s*25\([A-Z]{3}\)(\d{1,2}(?:,\d{1,2}){5})\s+\d{1,2}\s*$/;
-		const yearLineRe = /^\s*(20\d{2})\s*$/;
-		
+        const numsLineRe = /^\s*25\([A-Za-z]{3}\)\s*(\d{1,2}(?:,\d{1,2}){5})/;
+		  
 		let currentYear = null;
 
         const resultsByDate = new Map();
@@ -170,14 +169,8 @@ toggleBtn.addEventListener("click", () => {
 
 for (let i = 0; i < lines.length; i++) {
 
-  const y = lines[i].match(yearLineRe);
-  if (y) {
-    currentYear = parseInt(y[1], 10);
-    continue;
-  }
-
   const m = lines[i].match(dateLineRe);
-  if (!m || !currentYear) continue;
+  if (!m) continue;
 
   const dd = parseInt(m[1], 10);
   const mm = parseInt(m[2], 10);
@@ -189,15 +182,23 @@ for (let i = 0; i < lines.length; i++) {
   const n = lines[j].match(numsLineRe);
   if (!n) continue;
 
-  const dateObj = new Date(currentYear, mm - 1, dd);
-  if (isNaN(+dateObj) || dateObj < START || dateObj > END) continue;
+  let year = START.getFullYear();
+  let dateObj = new Date(year, mm - 1, dd);
+
+  if (dateObj < START) {
+    year++;
+    dateObj = new Date(year, mm - 1, dd);
+  }
+
+  if (dateObj < START || dateObj > END) continue;
 
   const nums = n[1].split(",").map(Number);
   if (nums.length !== 6) continue;
 
-  const dateStr = `${dd} ${monthNames[mm]} ${currentYear}`;
+  const dateStr = `${dd} ${monthNames[mm]} ${year}`;
   resultsByDate.set(dateStr, nums);
 }
+
 
 
         drawResults = Array.from(resultsByDate.entries())
