@@ -1,56 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BINGO</title>
+
 <style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #ff00aa, #000000);
-    color: #fff;
-    padding: 20px;
-  }
-  .container { max-width: 1200px; margin: 0 auto; }
-  h1 { text-align: center; font-size: 3em; margin: 0; text-shadow: 2px 2px #000; }
-  .winner { text-align: center; font-size: 1.8em; font-weight: bold; margin: 20px 0; color: #ffeb3b; text-shadow: 1px 1px #000; }
-  table { border-collapse: collapse; width: 100%; margin-top: 20px; font-size: 14px; background: rgba(0,0,0,0.7); color: #fff; border-radius: 10px; overflow: hidden; }
-  th, td { border: 1px solid #ff00aa; padding: 8px; text-align: center; }
-  th { background: #ff00aa; color: #000; position: sticky; top: 0; z-index: 5; }
-  tr:nth-child(even) { background: rgba(255,255,255,0.1); }
-  .highlight { background: #ffeb3b; font-weight: 700; color: #000; }
-  .results { margin-bottom: 20px; text-align: center; background: rgba(255,0,170,0.3); padding: 10px; border-radius: 10px; }
-  ul { list-style: none; padding: 0; margin: 0; }
-  li { padding: 6px; margin: 4px auto; width: fit-content; border-radius: 6px; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #ff00aa, #000000);
+  color: #fff;
+  padding: 20px;
+}
+.container { max-width: 1200px; margin: auto; }
+h1 { text-align: center; font-size: 3em; }
+.winner { text-align: center; font-size: 1.8em; color: #ffeb3b; margin: 20px 0; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(0,0,0,0.7);
+  border-radius: 10px;
+}
+th, td {
+  border: 1px solid #ff00aa;
+  padding: 8px;
+  text-align: center;
+}
+th {
+  background: #ff00aa;
+  color: #000;
+}
+.highlight {
+  background: #ffeb3b;
+  color: #000;
+  font-weight: bold;
+}
+.results {
+  background: rgba(255,0,170,0.3);
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+ul { list-style: none; padding: 0; }
 </style>
 </head>
+
 <body>
 <div class="container">
-  <h1>🎶 BINGO 🎶</h1>
+  <h1>🎶 B.I.N.G.O 🎶</h1>
   <div class="winner" id="winnerMessage"></div>
+    <button id="toggleResults" 
+      style="padding:10px 15px; background:#006400; border:none; color:#fff; border-radius:8px; cursor:pointer; margin-bottom:10px;">
+      Hide Results
+    </button>
 
-  <div class="results">
-    <h2>✨ Latest Results ✨</h2>
-    <ul id="resultsList"></ul>
-  </div>
+    <div class="results" id="resultsBox">
+      <h2>✨ Official 6/49 Draw Results ✨</h2>
+      <ul id="resultsList"></ul>
+    </div>
 
-  <table id="lottoTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>#1</th>
-        <th>#2</th>
-        <th>#3</th>
-        <th>#4</th>
-        <th>#5</th>
-        <th>#6</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+    <table id="lottoTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>#1</th>
+          <th>#2</th>
+          <th>#3</th>
+          <th>#4</th>
+          <th>#5</th>
+          <th>#6</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 </div>
 
-<script>
+  <script>
     const players = [
   { name: "CHRIS", nums: [12, 16, 28, 29, 34, 38] },
   { name: "KAT", nums: [5, 7, 19, 13, 42, 44] },
@@ -101,38 +127,110 @@
   { name: "BRYAN", nums: [1, 4, 10, 16, 30, 35] }
     ];
 
-const drawResults = [
-  { label: "04/02/2026", nums: [3,4,9,15,27,49] },
-  { label: "31/01/2026", nums: [1,7,21,33,41,47] },
-  { label: "28/01/2026", nums: [8,15,44,45,48,49] },
-  { label: "24/01/2026", nums: [9,13,15,28,41,49] },
-  { label: "21/01/2026", nums: [4,13,21,27,34,39] },
-  { label: "17/01/2026", nums: [10,12,15,33,34,45] },
-  { label: "14/01/2026", nums: [9,12,23,28,33,47] },
-  { label: "10/01/2026", nums: [16,19,26,31,47,49] }
-];
+    let drawResults = [];
+    let allDrawnNumbers = new Set();
 
-const tbody = document.querySelector('#lottoTable tbody');
-const resultsList = document.getElementById('resultsList');
-const winnerMessage = document.getElementById('winnerMessage');
+    const tbody = document.querySelector('#lottoTable tbody');
+    const resultsList = document.getElementById('resultsList');
+    const winnerMessage = document.getElementById('winnerMessage');
 
-// Display results
-resultsList.innerHTML = '';
-drawResults.forEach(r => {
-  const li = document.createElement('li');
-  li.textContent = `${r.label}: ${r.nums.join(', ')}`;
-  resultsList.appendChild(li);
-});
+    const toggleBtn = document.getElementById("toggleResults");
+    const resultsBox = document.getElementById("resultsBox");
 
-// Create a set of **all numbers across all results**
-const allDrawnNumbers = new Set();
+    toggleBtn.addEventListener("click", () => {
+      if (resultsBox.style.display === "none") {
+        resultsBox.style.display = "block";
+        toggleBtn.textContent = "Hide Results";
+      } else {
+        resultsBox.style.display = "none";
+        toggleBtn.textContent = "Show Results";
+      }
+    });
+
+    async function fetchMagayoResults() {
+      try {
+        const res = await fetch(
+          "https://r.jina.ai/http://www.lotto-8.com/canada/listltoCA649.asp",
+          { cache: "no-store" }
+        );
+        const text = await res.text();
+
+        const lines = text.split(/\r?\n/);
+        const dateLineRe = /^\s*(\d{2})\/(\d{2})\s*$/;
+        const numsLineRe = /^\s*26\([A-Za-z]{3}\)\s*(\d{1,2}(?:,\d{1,2}){5})/;
+        const START = new Date("2026-01-09T00:00:00");
+        const END = new Date("2026-04-13T23:59:59");
+        const monthNames = [null, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const resultsByDate = new Map();
+
+        for (let i = 0; i < lines.length; i++) {
+          const m = lines[i].match(dateLineRe);
+          if (!m) continue;
+
+          const dd = parseInt(m[1], 10);
+          const mm = parseInt(m[2], 10);
+
+          // Find next non-empty line for numbers
+          let j = i + 1;
+          while (j < lines.length && lines[j].trim() === "") j++;
+          if (j >= lines.length) continue;
+
+          const n = lines[j].match(numsLineRe);
+          if (!n) continue;
+
+          const nums = n[1].split(",").map(Number);
+          if (nums.length !== 6) continue;
+
+          const year = START.getFullYear();
+	  const dateObj = new Date(year, mm - 1, dd);
+
+          if (dateObj < START || dateObj > END) continue;
+
+          const dateStr = `${dd} ${monthNames[mm]} ${year}`;
+          resultsByDate.set(dateStr, nums);
+        }
+
+        drawResults = Array.from(resultsByDate.entries())
+          .map(([date, nums]) => ({ date, nums }))
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+allDrawnNumbers.clear();
 drawResults.forEach(r => r.nums.forEach(n => allDrawnNumbers.add(n)));
+        updateResultsList();
+        updateTable();
+      } catch (err) {
+        console.error("Error fetching results:", err);
+        const li = document.createElement("li");
+        li.textContent = "Unable to fetch results automatically.";
+        resultsList.appendChild(li);
+      } 
+    }
 
 // Highlight numbers and check winner only for the latest result
 function updateTable() {
   tbody.innerHTML = '';
+// ✅ NO DRAWS YET
+  if (!drawResults || drawResults.length === 0) {
+    players.forEach(player => {
+      const tr = document.createElement('tr');
+
+      const nameTd = document.createElement('td');
+      nameTd.textContent = player.name;
+      tr.appendChild(nameTd);
+
+      player.nums.forEach(num => {
+        const td = document.createElement('td');
+        td.textContent = num;
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    winnerMessage.textContent = "⏳ Waiting for first draw…";
+    return; // ⛔ stop here
+  }
   const latest = drawResults[0].nums; // for winner check
-  let winner = null;
+  let winners = [];
 
   players.forEach(player => {
     const tr = document.createElement('tr');
@@ -154,18 +252,30 @@ function updateTable() {
       tr.appendChild(td);
     });
 
-    if (matchCount === 6) winner = player.name;
+    if (matchCount === 6) winners.push(player.name);
     tbody.appendChild(tr);
   });
 
-  if (winner) {
-    winnerMessage.textContent = `🎉 Congratulations ${winner}! You got all 6 numbers! 🎉`;
-  } else {
-    winnerMessage.textContent = "No winner yet. Keep trying!";
-  }
+if (winners.length === 1) {
+  winnerMessage.textContent = `🎉 Congratulations ${winners[0]}! You got all 6 numbers! 🎉`;
+} else if (winners.length > 1) {
+  winnerMessage.textContent = `🔥 MULTIPLE WINNERS! 🔥 ${winners.join(", ")}`;
+} else {
+  winnerMessage.textContent = "No winner(s) yet. Good luck!";
 }
 
-updateTable();
-</script>
+}
+
+    function updateResultsList() {
+      resultsList.innerHTML = '';
+      drawResults.forEach(r => {
+        const li = document.createElement('li');
+        li.textContent = `${r.date}: ${r.nums.join(', ')}`;
+        resultsList.appendChild(li);
+      });
+    }
+
+    fetchMagayoResults();
+  </script>
 </body>
 </html>
