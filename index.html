@@ -79,7 +79,7 @@ ul { list-style: none; padding: 0; }
   <script>
 const players = [
   { name: "CHRIS", nums: [4,9,13,14,19,23] },
-  { name: "Kat", nums: [10,12,21,23,48,49] }
+  { name: "Kat", nums: [10,21,27,35,41,42] }
 
 ];
 
@@ -114,8 +114,8 @@ const players = [
         const lines = text.split(/\r?\n/);
         const dateLineRe = /^\s*(\d{2})\/(\d{2})\s*$/;
         const numsLineRe = /^\s*26\([A-Za-z]{3}\)\s*(\d{1,2}(?:,\d{1,2}){5})/;
-        const START = new Date("2026-05-27T00:00:00");
-        const END = new Date("2026-07-30T23:59:59");
+        const START = new Date("2026-07-17T00:00:00");
+        const END = new Date("2026-10-30T23:59:59");
         const monthNames = [null, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         const resultsByDate = new Map();
 
